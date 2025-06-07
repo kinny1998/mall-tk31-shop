@@ -1,0 +1,39 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+
+const app = express();
+const PORT = 3002;
+
+// 配置中间件
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 数据库连接
+const db = new sqlite3.Database('./database/safe_links.db', (err) => {
+  if (err) {
+    console.error('❌ 数据库连接失败:', err.message);
+  } else {
+    console.log('✅ 数据库已连接');
+    // 创建表（示例）
+    db.run(`
+      CREATE TABLE IF NOT EXISTS groups (
+        group_id TEXT PRIMARY KEY,
+        group_name TEXT NOT NULL,
+        sort_order INTEGER DEFAULT 100
+      )
+    `);
+  }
+});
+
+// 简单路由测试
+app.get('/', (req, res) => {
+  res.send('Hello, Mall Service!');
+});
+
+// 启动服务
+app.listen(PORT, () => {
+  console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
+});
